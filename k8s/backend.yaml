@@ -17,8 +17,28 @@ spec:
         image: ghcr.io/saketrama-v/votescale-backend:latest
         imagePullPolicy: Always
         env:
+        - name: DB_USER
+          valueFrom:
+            configMapKeyRef:
+              name: db-config
+              key: db-user
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: db-password
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: db-config
+              key: db-host
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: db-config
+              key: db-name
         - name: DATABASE_URL
-          value: postgresql://postgres:secret@postgres-service:5432/votedb
+          value: postgresql://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):5432/$(DB_NAME)
         ports:
         - containerPort: 8000
 ---

@@ -28,11 +28,20 @@ spec:
         image: postgres:15
         env:
         - name: POSTGRES_DB
-          value: votedb
+          valueFrom:
+            configMapKeyRef:
+              name: db-config
+              key: db-name
         - name: POSTGRES_USER
-          value: postgres
+          valueFrom:
+            configMapKeyRef:
+              name: db-config
+              key: db-user
         - name: POSTGRES_PASSWORD
-          value: secret
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: db-password
         ports:
         - containerPort: 5432
         volumeMounts:
