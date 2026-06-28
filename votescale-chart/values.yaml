@@ -1,0 +1,28 @@
+# Default values for VoteScale Chart.
+# These variables will be injected into our Kubernetes manifest templates.
+
+backend:
+  replicaCount: 1
+  image:
+    repository: ghcr.io/saketrama-v/votescale-backend
+    tag: latest
+  service:
+    nodePort: 30008
+
+frontend:
+  replicaCount: 1
+  image:
+    repository: ghcr.io/saketrama-v/votescale-frontend
+    tag: latest
+  service:
+    nodePort: 30080
+
+postgres:
+  storageSize: 1Gi
+  dbName: votedb
+  dbUser: postgres
+  # Note: The database password. Helm will automatically base64 encode this in secrets.yaml!
+  dbPassword: secret
+
+ingress:
+  host: votescale.local
