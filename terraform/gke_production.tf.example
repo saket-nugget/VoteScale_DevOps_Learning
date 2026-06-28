@@ -1,0 +1,56 @@
+# This is a production blueprint for provisioning a GKE cluster on Google Cloud.
+# To run this, you would rename this file to main.tf and configure your GCP Project.
+
+terraform {
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = "~> 5.0"
+    }
+  }
+}
+
+provider "google" {
+  project = "your-gcp-project-id" # Replace with your GCP project ID
+  region  = "us-central1"
+}
+
+# 1. Create a Custom VPC (Virtual Private Cloud) Network
+resource "google_compute_network" "vpc_network" {
+  name                    = "votescale-vpc"
+  auto_create_subnetworks = false
+}
+
+# 2. Create a Subnet inside the VPC
+resource "google_compute_subnetwork" "subnet" {
+  name          = "votescale-subnet"
+  ip_cidr_range = "10.0.0.0/24"
+  region        = "us-central1"
+  network       = google_compute_network.vpc_network.id
+}
+
+# 3. Provision the GKE Autopilot Cluster inside our VPC/Subnet
+resource "google_container_cluster" "gke_cluster" {
+  name     = "votescale-production-cluster"
+  location = "us-central1"
+
+  # Autopilot clusters manage their own node sizing and scaling automatically
+  enable_autopilot = true
+
+  network    = google_compute_network.vpc_network.name
+  subnetwork = google_compute_subnetwork.subnet.name
+
+  # Set to false so Terraform can cleanly destroy the cluster when requested
+  deletion_protection = false
+}
+
+# Outputs: Print connection details to the terminal after creation
+output "kubernetes_cluster_name" {
+  value       = google_container_cluster.gke_cluster.name
+  description = "GKE Cluster Name"
+}
+
+output "kubernetes_cluster_host" {
+  value       = google_container_cluster.gke_cluster.endpoint
+  description = "GKE Cluster Endpoint"
+}
