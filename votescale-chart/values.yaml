@@ -10,7 +10,7 @@ backend:
     nodePort: 30008
 
 frontend:
-  replicaCount: 1
+  replicaCount: 2
   image:
     repository: ghcr.io/saketrama-v/votescale-frontend
     tag: latest
